@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yy.jsonInterfaceTest.mapper.ProjectMapper">
+    <insert id="add" parameterType="com.yy.jsonInterfaceTest.po.Project">
+        <selectKey keyProperty="id" order="AFTER" resultType="int">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into interface_test_project(id, name, description, prefixUrl, createTime)
+        values(#{id}, #{name}, #{description}, #{prefixUrl}, #{createTime})
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        delete from interface_test_project where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.yy.jsonInterfaceTest.po.Project">
+        update interface_test_project set
+        id = #{id}, name = #{name}, description = #{description}, prefixUrl = #{prefixUrl}, createTime = #{createTime}
+        where id = #{id}
+    </update>
+
+    <select id="find" parameterType="com.yy.jsonInterfaceTest.util.QueryCondition" resultType="com.yy.jsonInterfaceTest.po.Project">
+        select id, name, description, prefixUrl, createTime from interface_test_project
+        <if test="useWhere">
+            where
+            <foreach collection="conditions" index="index" item="obj">
+                <choose>
+                    <when test="index == 0">${obj.field} ${obj.operator} #{obj.value}</when>
+                    <otherwise>${obj.join} ${obj.field} ${obj.operator} #{obj.value}</otherwise>
+                </choose>
+            </foreach>
+        </if>
+
+        <if test="useSort">
+            order by
+            <foreach collection="sorts" item="obj" separator=",">
+                ${obj}
+            </foreach>
+        </if>
+
+        limit 0, 1
+    </select>
+
+    <select id="findById" parameterType="int" resultType="com.yy.jsonInterfaceTest.po.Project">
+        select id, name, description, prefixUrl, createTime from interface_test_project
+        where id = #{id}
+    </select>
+
+    <select id="query" parameterType="com.yy.jsonInterfaceTest.util.QueryCondition" resultType="com.yy.jsonInterfaceTest.po.Project">
+        select id, name, description, prefixUrl, createTime from interface_test_project
+        <if test="useWhere"> <!-- 添加查询条件 -->
+            where
+            <foreach collection="conditions" index="index" item="obj">
+                <choose>
+                    <when test="index == 0">${obj.field} ${obj.operator} #{obj.value}</when>
+                    <otherwise>${obj.join} ${obj.field} ${obj.operator} #{obj.value}</otherwise>
+                </choose>
+            </foreach>
+        </if>
+
+        <if test="useSort"> <!-- 添加排序 -->
+            order by
+            <foreach collection="sorts" item="obj" separator=",">
+                ${obj}
+            </foreach>
+        </if>
+
+        <if test="page != null"> <!-- 添加分页 -->
+            limit ${page.beginIndex}, ${page.pageSize}
+        </if>
+    </select>
+
+    <select id="getCount" parameterType="com.yy.jsonInterfaceTest.util.QueryCondition" resultType="int">
+        select count(*) from interface_test_project
+        <if test="useWhere">
+            where
+            <foreach collection="conditions" index="index" item="obj">
+                <choose>
+                    <when test="index == 0">${obj.field} ${obj.operator} #{obj.value}</when>
+                    <otherwise>${obj.join} ${obj.field} ${obj.operator} #{obj.value}</otherwise>
+                </choose>
+            </foreach>
+        </if>
+    </select>
+</mapper>

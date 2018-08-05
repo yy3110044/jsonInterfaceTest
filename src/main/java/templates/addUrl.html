@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>添加接口</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<script src="js/jquery.js"></script>
+<script>
+var projectId = null;
+$(document).ready(function(){
+	projectId = $("body").attr("projectId");
+	$.ajax({
+		type : "POST",
+		cache : false,
+		url : "getProject",
+		data : {
+			"projectId" : projectId
+		},
+		dataType : "json",
+		success : function(data) {
+			var project = data.result;
+			$("#prefixUrl").html(project.prefixUrl);
+			$("#projectName").html(project.name);
+		}
+	});
+});
+var addParam = function(){
+	var str = '<div class="paramDiv">';
+	str += '<input type="text" class="name" placeholder="参数名" style="width:150px;">&nbsp;&nbsp;';
+	str += '类型:<select class="type"><option>string</option><option>int</option><option>float</option></select>&nbsp;&nbsp;';
+	str += '必须:<select class="required"><option value="true">是</option><option value="false">否</option></select>&nbsp;&nbsp;';
+	str += '<input class="defaultValue" type="text" placeholder="默认值" style="width:150px;">&nbsp;&nbsp;';
+	str += '<input class="description" type="text" placeholder="描述" style="width:350px;">&nbsp;&nbsp;';
+	str += '<a href="javascript:;" onclick="$(this).parent().remove()">删除</a>';
+	str += '</div>';
+	$("#contentDiv").append(str);
+};
+var add = function(){
+	var url = $.trim($("#url").val());
+	var method = $.trim($("#method").val());
+	var description = $.trim($("#description").val());
+	
+	if(url == null || "" == url) {
+		alert("url不能为空");
+		return;
+	}
+	
+	if(method == null || "" == method) {
+		alert("method不能为空");
+		return;
+	}
+	
+	var paramJsonStr = new Array();
+	$("div.paramDiv").each(function(){
+		var name = $.trim($(this).children(".name").val());
+		var type = $.trim($(this).children(".type").val());
+		var required = $.trim($(this).children(".required").val());
+		var defaultValue = $.trim($(this).children(".defaultValue").val());
+		var description = $.trim($(this).children(".description").val());
+		var str = '{';
+		str += '"name":"' + name + '",';
+		str += '"type":"' + type + '",';
+		str += '"required":"' + required + '",';
+		str += '"defaultValue":"' + defaultValue + '",';
+		str += '"description":"' + description + '"';
+		str += '}';
+		paramJsonStr.push(str);
+	});
+	$.ajax({
+		type : "POST",
+		cache : false,
+		url : "addUrl",
+		data : {
+			"projectId" : projectId,
+			"url" : url,
+			"method" : method,
+			"description" : description,
+			"paramJsonStr[]" : paramJsonStr
+		},
+		dataType : "json",
+		success : function(data) {
+			alert(data.msg);
+			if(data.code == 100) {
+				$("#url").val("");
+				$("#description").val("");
+				$("div.paramDiv").remove();
+			}
+		}
+	});
+};
+</script>
+<style type="text/css">
+div{margin-bottom: 4px;}
+</style>
+</head>
+<body th:projectId="${projectId}">
+
+<div id="contentDiv">
+<span id="projectName"></span>接口添加<br>
+url：<span id="prefixUrl"></span><input type="text" id="url" placeholder="url" style="width:400px;"><br>
+method：<select id="method"><option selected="selected">post</option><option>getpost</option><option>get</option></select><br>
+描述：<input type="text" id="description" placeholder="描述" style="width:350px;"><br>
+<a href="javascript:;" onclick="addParam()">添加参数</a><br>
+</div>
+
+<div>
+<input type="button" value="添加" onclick="add()">
+</div>
+</body>
+</html>

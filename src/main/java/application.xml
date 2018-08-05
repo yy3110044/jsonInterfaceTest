@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>spring boot参数配置</comment>
+
+    <!-- web配置，若在web容器里运行，此参数无效 -->
+	<entry key="server.port">80</entry>
+	<entry key="server.servlet.context-path">/</entry>
+	<entry key="server.session.timeout">3600</entry><!-- session过期时间：秒 -->
+	
+	<entry key="spring.thymeleaf.cache">false</entry><!-- 关闭thymeleaf缓存，开发时关闭 -->
+
+    <!-- 上传文件大小限制设置 -->
+    <entry key="spring.servlet.multipart.max-file-size">450MB</entry>
+    <entry key="spring.servlet.multipart.max-request-size">450MB</entry>
+    
+    <!-- 数据库连接配置 -->
+    <entry key="spring.datasource.url"><![CDATA[jdbc:mysql://localhost:3306/interfaceTest?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&zeroDateTimeBehavior=convertToNull]]></entry>
+    <entry key="spring.datasource.username">root</entry>
+    <entry key="spring.datasource.password">910123</entry>
+    <entry key="spring.datasource.driver-class-name">com.mysql.jdbc.Driver</entry>
+
+    <!-- 日志相关配置 TRACE < DEBUG < INFO < WARN < ERROR < FATAL -->
+    <entry key="logging.file">/tmp/logs/jsonInterfaceTest/jsonInterfaceTest.log</entry>
+    <entry key="logging.level.org.mybatis">INFO</entry>
+    
+    <!-- jackson时间格式设置 -->
+    <entry key="spring.jackson.date-format">yyyy-MM-dd HH:mm:ss</entry>
+    <entry key="spring.jackson.time-zone">GMT+8</entry>
+</properties>

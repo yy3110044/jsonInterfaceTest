@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>项目详情</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<script src="js/jquery.js"></script>
+<script>
+var empty = function(str){
+	return str == null || "" == str;
+};
+var projectId = null;
+var projectPrefixUrl = null;
+$(document).ready(function(){
+	projectId = $("body").attr("projectId");
+	$("#goAddUrl").attr("href", "addUrl?projectId=" + projectId);
+	
+	$.ajax({
+		type : "POST",
+		cache : false,
+		url : "getProject",
+		data : {
+			"projectId" : projectId
+		},
+		dataType : "json",
+		success : function(data) {
+			var project = data.result;
+			projectPrefixUrl = project.prefixUrl;
+			$("#projectName").html(project.name + "接口");
+			$("title").html(project.name + "项目详情");
+
+			$.ajax({
+				type : "POST",
+				cache : false,
+				url : "getAllUrl",
+				data : {
+					"projectId" : projectId
+				},
+				dataType : "json",
+				success : function(data) {
+					var list = data.result;
+					var str = '';
+					for(var i=0; i<list.length; i++) {
+						var obj = list[i];
+						str += '<tr>';
+						str += '<td>' + project.prefixUrl + obj.url + '</td>';
+						str += '<td>' + obj.method + '</td>';
+						str += '<td>' + obj.description + '</td>';
+						str += '<td><a href="javascript:;" onclick="test(' + obj.id + ', this)">测试</a>&nbsp;<a href="javascript:;" onclick="del(' + obj.id + ')">删除</a></td>';
+						str += '</tr>';
+					}
+					$("table").append(str);
+				}
+			});
+		}
+	});
+});
+
+var test = function(urlId, e){
+	$.ajax({
+		type : "POST",
+		cache : false,
+		url : "getUrl",
+		data : {
+			"urlId" : urlId
+		},
+		dataType : "json",
+		success : function(data){
+			var url = data.result.url;
+			var paramList = data.result.paramList;
+
+			$("tr#testTr").remove();
+			var str = '<tr id="testTr" data-url="' + projectPrefixUrl + url.url + '" data-method="' + url.method + '"><td colspan="99">';
+			for(var i=0; i<paramList.length; i++) {
+				var obj = paramList[i];
+				str += '<div>';
+				str += '<span>' + obj.name + '：</span>';
+				str += '<input class="paramInput" type="text" name="' + obj.name + '" placeholder="' + obj.description + '(' + obj.type + ')' + '(' + (obj.required ? '必填' : '非必填') + ')' + '" data-type="' + obj.type + '" data-required="' + obj.required + '" value="' + obj.defaultValue + '">';
+				str += '&nbsp;<a href="javascript:;" onclick="delParam(' + obj.id + ')">删除此参数</a>';
+				str += '</div>';
+			}
+			str += '<div><input type="button" value="测试" onclick="test2()"></div>';
+			str += '<div class="resultDiv" style="padding:4px;"></div>';
+			str += '</td></tr>';
+			$(e).parent().parent().after(str);
+		}
+	});
+};
+var test2 = function(){
+	var testTr = $("#testTr");
+	var url = testTr.attr("data-url");
+	var method = testTr.attr("data-method");
+	
+	var params = new Array();
+	testTr.find("input.paramInput").each(function(){
+		var ts = $(this);
+		var param = new Object();
+		param.name = $.trim(ts.attr("name"));
+		param.value = $.trim(ts.val());
+		param.type = $.trim(ts.attr("data-type"));
+		param.required = $.trim(ts.attr("data-required"));
+		params.push(param);
+	});
+	
+	var postData = new Object();
+	var getParamUrl = '';
+	var flag = true;//是检测通过
+	var errorMsg = ''; //错误信息
+	for(var i=0; i<params.length; i++) {
+		var obj = params[i];
+		if(obj.required == 'true' && empty(obj.value)) {
+			flag = false;
+			errorMsg = obj.name + "：不能为空";
+			break;
+		}
+		postData[obj.name] = obj.value;
+		getParamUrl += obj.name + "=" + obj.value + "&";
+	}
+	
+	if(flag) {
+		if(method == "get") { //get方式
+			$.ajax({
+				type : "get",
+				cache : false,
+				url : url + "?" + getParamUrl,
+				dataType : "text",
+				success : function(data) {
+					$("div.resultDiv").html(data);
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+					//alert(XMLHttpRequest.status);
+					$("div.resultDiv").html(XMLHttpRequest.responseText);
+				}
+			});
+		} else { //post方式
+			$.ajax({
+				type : "post",
+				cache : false,
+				url : url,
+				data : postData,
+				dataType : "text",
+				success : function(data, textStatus) {
+					$("div.resultDiv").html(data);
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+					//alert(XMLHttpRequest.status);
+					$("div.resultDiv").html(XMLHttpRequest.responseText);
+				}
+			});
+		}
+	} else {
+		alert(errorMsg);
+	}
+}
+
+var delParam = function(paramId) {
+	if(!confirm("确定删除？")) {
+		return;
+	}
+	$.ajax({
+		type : "POST",
+		cache : false,
+		url : "deleteParam",
+		data : {
+			"paramId" : paramId
+		},
+		dataType : "json",
+		success : function(data) {
+			alert(data.msg);
+			if(data.code == 100) {
+				window.location.reload();
+			}
+		}
+	})
+}
+
+var del = function(urlId) {
+	if(!confirm("确定删除？")) {
+		return;
+	}
+	$.ajax({
+		type : "POST",
+		cache : false,
+		url : "deleteUrl",
+		data : {
+			"urlId" : urlId
+		},
+		dataType : "json",
+		success : function(data){
+			alert(data.msg);
+			if(data.code == 100) {
+				window.location.reload();
+			}
+		}
+	});
+}
+</script>
+<style type="text/css">
+div {margin-bottom:4px;}
+table,table tr th, table tr td { border:1px solid grey;padding:3px;}
+table {border-collapse: collapse;}
+</style>
+</head>
+<body th:projectId="${projectId}">
+<div>
+<span id="projectName"></span>&nbsp;
+<a href="" target="_blank" id="goAddUrl">添加接口</a>
+</div>
+
+<div>
+<table>
+	<tr>
+		<th>url</th><th>方法</th><th>接口描述</th><th>操作</th>
+	</tr>
+</table>
+</div>
+</body>
+</html>

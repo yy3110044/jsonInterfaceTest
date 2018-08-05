@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yy.jsonInterfaceTest.mapper.InterfaceParamMapper">
+    <insert id="add" parameterType="com.yy.jsonInterfaceTest.po.InterfaceParam">
+        <selectKey keyProperty="id" order="AFTER" resultType="int">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into interface_test_param(id, urlId, name, type, required, defaultValue, description)
+        values(#{id}, #{urlId}, #{name}, #{type}, #{required}, #{defaultValue}, #{description})
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        delete from interface_test_param where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.yy.jsonInterfaceTest.po.InterfaceParam">
+        update interface_test_param set
+        id = #{id}, urlId = #{urlId}, name = #{name}, type = #{type}, required = #{required}, defaultValue = #{defaultValue}, description = #{description}
+        where id = #{id}
+    </update>
+
+    <select id="find" parameterType="com.yy.jsonInterfaceTest.util.QueryCondition" resultType="com.yy.jsonInterfaceTest.po.InterfaceParam">
+        select id, urlId, name, type, required, defaultValue, description from interface_test_param
+        <if test="useWhere">
+            where
+            <foreach collection="conditions" index="index" item="obj">
+                <choose>
+                    <when test="index == 0">${obj.field} ${obj.operator} #{obj.value}</when>
+                    <otherwise>${obj.join} ${obj.field} ${obj.operator} #{obj.value}</otherwise>
+                </choose>
+            </foreach>
+        </if>
+
+        <if test="useSort">
+            order by
+            <foreach collection="sorts" item="obj" separator=",">
+                ${obj}
+            </foreach>
+        </if>
+
+        limit 0, 1
+    </select>
+
+    <select id="findById" parameterType="int" resultType="com.yy.jsonInterfaceTest.po.InterfaceParam">
+        select id, urlId, name, type, required, defaultValue, description from interface_test_param
+        where id = #{id}
+    </select>
+
+    <select id="query" parameterType="com.yy.jsonInterfaceTest.util.QueryCondition" resultType="com.yy.jsonInterfaceTest.po.InterfaceParam">
+        select id, urlId, name, type, required, defaultValue, description from interface_test_param
+        <if test="useWhere"> <!-- 添加查询条件 -->
+            where
+            <foreach collection="conditions" index="index" item="obj">
+                <choose>
+                    <when test="index == 0">${obj.field} ${obj.operator} #{obj.value}</when>
+                    <otherwise>${obj.join} ${obj.field} ${obj.operator} #{obj.value}</otherwise>
+                </choose>
+            </foreach>
+        </if>
+
+        <if test="useSort"> <!-- 添加排序 -->
+            order by
+            <foreach collection="sorts" item="obj" separator=",">
+                ${obj}
+            </foreach>
+        </if>
+
+        <if test="page != null"> <!-- 添加分页 -->
+            limit ${page.beginIndex}, ${page.pageSize}
+        </if>
+    </select>
+
+    <select id="getCount" parameterType="com.yy.jsonInterfaceTest.util.QueryCondition" resultType="int">
+        select count(*) from interface_test_param
+        <if test="useWhere">
+            where
+            <foreach collection="conditions" index="index" item="obj">
+                <choose>
+                    <when test="index == 0">${obj.field} ${obj.operator} #{obj.value}</when>
+                    <otherwise>${obj.join} ${obj.field} ${obj.operator} #{obj.value}</otherwise>
+                </choose>
+            </foreach>
+        </if>
+    </select>
+    
+    <insert id="addBatch" parameterType="java.util.Collection">
+        insert into interface_test_param (id, urlId, name, type, required, defaultValue, description)
+        values
+        <foreach collection="params" item="obj" separator=",">
+            (#{obj.id}, #{obj.urlId}, #{obj.name}, #{obj.type}, #{obj.required}, #{obj.defaultValue}, #{obj.description})
+        </foreach>
+    </insert>
+    
+    <delete id="deleteByUrlId" parameterType="int">
+    	delete from interface_test_param where urlId = #{urlId}
+    </delete>
+</mapper>

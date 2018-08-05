@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>添加项目</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<script src="js/jquery.js"></script>
+<script>
+var check = function(){
+	var name = $.trim($("input[name='name']").val());
+	if(name == null || "" == name) {
+		alert("项目名不能为空");
+		return false;
+	}
+	
+	var prefixUrl = $.trim($("input[name='prefixUrl']").val());
+	if(prefixUrl == null || "" == prefixUrl) {
+		alert("url前缀不能为空");
+		return false;
+	}
+	return true;
+}
+</script>
+</head>
+<body>
+<form action="addProject" method="post" onsubmit="return check()">
+项目名：<input type="text" name="name" placeholder="项目名"><br>
+项目描述：<input type="text" name="description" placeholder="项目描述"><br>
+项目url前缀：<input type="text" name="prefixUrl" placeholder="项目url前缀"><br>
+<input type="submit" value="提交">
+</form>
+</body>
+</html>
