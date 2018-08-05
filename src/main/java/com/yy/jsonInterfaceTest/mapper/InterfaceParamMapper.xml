@@ -7,8 +7,8 @@
         <selectKey keyProperty="id" order="AFTER" resultType="int">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        insert into interface_test_param(id, urlId, name, type, required, defaultValue, description)
-        values(#{id}, #{urlId}, #{name}, #{type}, #{required}, #{defaultValue}, #{description})
+        insert into interface_test_param(id, urlId, name, type, enumTypes, required, defaultValue, description)
+        values(#{id}, #{urlId}, #{name}, #{type}, #{enumTypes}, #{required}, #{defaultValue}, #{description})
     </insert>
 
     <delete id="delete" parameterType="int">
@@ -17,12 +17,12 @@
 
     <update id="update" parameterType="com.yy.jsonInterfaceTest.po.InterfaceParam">
         update interface_test_param set
-        id = #{id}, urlId = #{urlId}, name = #{name}, type = #{type}, required = #{required}, defaultValue = #{defaultValue}, description = #{description}
+        id = #{id}, urlId = #{urlId}, name = #{name}, type = #{type}, enumTypes = #{enumTypes}, required = #{required}, defaultValue = #{defaultValue}, description = #{description}
         where id = #{id}
     </update>
 
     <select id="find" parameterType="com.yy.jsonInterfaceTest.util.QueryCondition" resultType="com.yy.jsonInterfaceTest.po.InterfaceParam">
-        select id, urlId, name, type, required, defaultValue, description from interface_test_param
+        select id, urlId, name, type, enumTypes, required, defaultValue, description from interface_test_param
         <if test="useWhere">
             where
             <foreach collection="conditions" index="index" item="obj">
@@ -44,12 +44,12 @@
     </select>
 
     <select id="findById" parameterType="int" resultType="com.yy.jsonInterfaceTest.po.InterfaceParam">
-        select id, urlId, name, type, required, defaultValue, description from interface_test_param
+        select id, urlId, name, type, enumTypes, required, defaultValue, description from interface_test_param
         where id = #{id}
     </select>
 
     <select id="query" parameterType="com.yy.jsonInterfaceTest.util.QueryCondition" resultType="com.yy.jsonInterfaceTest.po.InterfaceParam">
-        select id, urlId, name, type, required, defaultValue, description from interface_test_param
+        select id, urlId, name, type, enumTypes, required, defaultValue, description from interface_test_param
         <if test="useWhere"> <!-- 添加查询条件 -->
             where
             <foreach collection="conditions" index="index" item="obj">
@@ -86,10 +86,10 @@
     </select>
     
     <insert id="addBatch" parameterType="java.util.Collection">
-        insert into interface_test_param (id, urlId, name, type, required, defaultValue, description)
+        insert into interface_test_param (id, urlId, name, type, enumTypes, required, defaultValue, description)
         values
         <foreach collection="params" item="obj" separator=",">
-            (#{obj.id}, #{obj.urlId}, #{obj.name}, #{obj.type}, #{obj.required}, #{obj.defaultValue}, #{obj.description})
+            (#{obj.id}, #{obj.urlId}, #{obj.name}, #{obj.type}, #{obj.enumTypes}, #{obj.required}, #{obj.defaultValue}, #{obj.description})
         </foreach>
     </insert>
     

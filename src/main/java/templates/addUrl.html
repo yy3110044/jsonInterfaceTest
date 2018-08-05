@@ -26,7 +26,7 @@ $(document).ready(function(){
 var addParam = function(){
 	var str = '<div class="paramDiv">';
 	str += '<input type="text" class="name" placeholder="参数名" style="width:150px;">&nbsp;&nbsp;';
-	str += '类型:<select class="type"><option>string</option><option>int</option><option>float</option></select>&nbsp;&nbsp;';
+	str += '类型:<select class="type" onchange="typeChange(this)"><option>string</option><option>int</option><option>float</option><option>enum</option></select>&nbsp;&nbsp;';
 	str += '必须:<select class="required"><option value="true">是</option><option value="false">否</option></select>&nbsp;&nbsp;';
 	str += '<input class="defaultValue" type="text" placeholder="默认值" style="width:150px;">&nbsp;&nbsp;';
 	str += '<input class="description" type="text" placeholder="描述" style="width:350px;">&nbsp;&nbsp;';
@@ -34,6 +34,16 @@ var addParam = function(){
 	str += '</div>';
 	$("#contentDiv").append(str);
 };
+
+var typeChange = function(e){
+	var val = $(e).val();
+	if("enum" == val) {
+		$(e).after('&nbsp;<input type="text" class="enumTypes" style="width:400px;" placeholder="输入枚举类型，用 , 号隔开">');
+	} else {
+		$(e).parent().children(".enumTypes").remove();
+	}
+};
+
 var add = function(){
 	var url = $.trim($("#url").val());
 	var method = $.trim($("#method").val());
@@ -53,12 +63,14 @@ var add = function(){
 	$("div.paramDiv").each(function(){
 		var name = $.trim($(this).children(".name").val());
 		var type = $.trim($(this).children(".type").val());
+		var enumTypes = $.trim($(this).children(".enumTypes").val());
 		var required = $.trim($(this).children(".required").val());
 		var defaultValue = $.trim($(this).children(".defaultValue").val());
 		var description = $.trim($(this).children(".description").val());
 		var str = '{';
 		str += '"name":"' + name + '",';
 		str += '"type":"' + type + '",';
+		str += '"enumTypes":"' + enumTypes + '",';
 		str += '"required":"' + required + '",';
 		str += '"defaultValue":"' + defaultValue + '",';
 		str += '"description":"' + description + '"';

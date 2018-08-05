@@ -75,6 +75,14 @@ var test = function(urlId, e){
 				str += '<div>';
 				str += '<span>' + obj.name + '：</span>';
 				str += '<input class="paramInput" type="text" name="' + obj.name + '" placeholder="' + obj.description + '(' + obj.type + ')' + '(' + (obj.required ? '必填' : '非必填') + ')' + '" data-type="' + obj.type + '" data-required="' + obj.required + '" value="' + obj.defaultValue + '">';
+				if(obj.type == 'enum') {
+					str += '&nbsp;<select onchange="enumTypeChange(this)">';
+					var strs = obj.enumTypes.split(",");
+					for(var j=0; j<strs.length; j++) {
+						str += '<option value="' + strs[j] + '">' + strs[j] + '</option>';
+					}
+					str += '</select>';
+				}
 				str += '&nbsp;<a href="javascript:;" onclick="delParam(' + obj.id + ')">删除此参数</a>';
 				str += '</div>';
 			}
@@ -85,6 +93,11 @@ var test = function(urlId, e){
 		}
 	});
 };
+
+var enumTypeChange = function(e) {
+	$(e).parent().children(".paramInput").val($(e).val());
+}
+
 var test2 = function(){
 	var testTr = $("#testTr");
 	var url = testTr.attr("data-url");

@@ -5,6 +5,7 @@ public class InterfaceParam {
 	private int urlId;
 	private String name;
 	private String type;
+	private String enumTypes;
 	private boolean required;
 	private String defaultValue;
 	private String description;
@@ -34,6 +35,12 @@ public class InterfaceParam {
 	}
 	public void setUrlId(int urlId) {
 		this.urlId = urlId;
+	}
+	public String getEnumTypes() {
+		return enumTypes;
+	}
+	public void setEnumTypes(String enumTypes) {
+		this.enumTypes = enumTypes;
 	}
 	public void setName(String name) {
 		this.name = name;
